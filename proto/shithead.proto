@@ -1,0 +1,14 @@
+syntax = "proto3";
+package shithead;
+
+service Game {
+    rpc CreateGame (CreateGameRequest) returns (CreateGameResponse);
+}
+
+message CreateGameRequest {
+    string creator = 1;
+}
+
+message CreateGameResponse {
+    string id = 1;
+}

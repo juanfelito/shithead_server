@@ -3,6 +3,7 @@ package shithead;
 
 service Game {
     rpc CreateGame (CreateGameRequest) returns (CreateGameResponse);
+    rpc GetGame (GetGameRequest) returns (GetGameResponse);
 }
 
 message CreateGameRequest {
@@ -11,4 +12,13 @@ message CreateGameRequest {
 
 message CreateGameResponse {
     string id = 1;
+}
+
+message GetGameRequest {
+    string id = 1;
+}
+
+message GetGameResponse {
+    string id = 1;
+    repeated string players = 2;
 }

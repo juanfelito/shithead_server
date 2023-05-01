@@ -3,10 +3,13 @@ use tonic::{transport::Server};
 
 use shithead::game_server::{GameServer};
 use controllers::game::GameService;
+use mediators::game::GameMediator;
 
-mod repo;
-mod models;
 mod controllers;
+mod mediators;
+mod models;
+mod repo;
+
 pub mod shithead {
     tonic::include_proto!("shithead");
 }
@@ -20,7 +23,9 @@ async fn main() -> Result<()> {
     // println!("{:?}", res);
     
     let addr = "[::1]:50051".parse()?;
-    let game_service = GameService::new(repo);
+
+    let game_mediator = GameMediator::new(repo);
+    let game_service = GameService::new(game_mediator);
 
     Server::builder()
         .add_service(GameServer::new(game_service))

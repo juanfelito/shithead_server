@@ -8,13 +8,11 @@ pub struct WithId<T> {
     pub inner: T,
 }
 
-impl<T> WithId<T> {
-    fn new(id: Thing, inner: T) -> Self {
-        Self { id, inner }
-    }
-}
+// impl<T> WithId<T> {
+//     fn new(id: Thing, inner: T) -> Self {
+//         Self { id, inner }
+//     }
+// }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Game {
-    pub players: Vec<String>,
-}
+pub mod game;
+pub mod discard;

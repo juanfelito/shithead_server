@@ -1,7 +1,9 @@
-use crate::repo::SurrealDBRepo;
 use anyhow::{Result, Error};
-use crate::models::{Game, WithId};
 use core::result::Result::Ok;
+use crate::models::discard::Discard;
+use crate::models::game::{Game, GameState};
+use crate::models::WithId;
+use crate::repo::SurrealDBRepo;
 
 #[derive(Debug)]
 pub struct GameMediator {
@@ -26,13 +28,28 @@ impl GameMediator {
         }
     }
 
-    pub async fn create_game(&self, creator_id: String) -> Result<WithId<Game>,Error> {
-        println!("trying to create a new game");
+    pub async fn create_game(&self) -> Result<WithId<Game>,Error> {
+        println!("creating a new discard pile...");
+        let discard: WithId<Discard> = self.repo.db.create("discard")
+            .content(Discard{
+                current_value: None,
+                current_card: None,
+                repeat_count: 0,
+                cards: vec![],
+            })
+        .await.expect("couldn't create empty discard");
+
+        println!("creating a new game...");
         let game: Result<WithId<Game>, surrealdb::Error> = self.repo.db.create("game")
             .content(Game{
-                players: vec![creator_id]
+                deck: vec![],
+                discard: discard.id,
+                players_out: vec![],
+                state: GameState::Lobby,
+                turn: 0,
             })
         .await;
+
         match game {
             Ok(game) => {
                 Ok(game)

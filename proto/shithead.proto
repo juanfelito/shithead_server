@@ -6,6 +6,10 @@ service Game {
     rpc GetGame (GetGameRequest) returns (GetGameResponse);
 }
 
+service Discard {
+    rpc GetDiscard(GetDiscardRequest) returns (GetDiscardResponse);
+}
+
 message CreateGameRequest {
     string creator = 1;
 }
@@ -19,6 +23,22 @@ message GetGameRequest {
 }
 
 message GetGameResponse {
-    string id = 1;
-    repeated string players = 2;
+    repeated string deck = 1;
+    string discard_id = 2;
+    string id = 3;
+    repeated uint32 players_out = 4;
+    string state = 5;
+    uint32 turn = 6;
+}
+
+message GetDiscardRequest {
+    string game_id = 1;
+}
+
+message GetDiscardResponse {
+    optional string current_value = 1;
+    optional string current_card = 2;
+    string id = 3;
+    uint32 repeat_count = 4;
+    repeated string cards = 5;
 }

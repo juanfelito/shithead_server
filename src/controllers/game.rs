@@ -28,8 +28,12 @@ impl Game for GameService {
         match res {
             Ok(game) => {
                 let reply = GetGameResponse {
+                    deck: game.inner.deck,
+                    discard_id: game.inner.discard.id.to_string(),
                     id: game.id.id.to_string(),
-                    players: game.inner.players,
+                    players_out: game.inner.players_out,
+                    state: game.inner.state.into(),
+                    turn: game.inner.turn,
                 };
                 Ok(Response::new(reply))
             }
@@ -46,9 +50,9 @@ impl Game for GameService {
     ) -> Result<Response<CreateGameResponse>, Status > {
         println!("Got a create request: {:?}", request);
 
-        let req = request.into_inner();
+        //let req = request.into_inner();
 
-        let res = self.mediator.create_game(req.creator).await;
+        let res = self.mediator.create_game().await;
 
         match res {
             Ok(created) => {

@@ -28,6 +28,7 @@ impl Game for GameService {
         match res {
             Ok(game) => {
                 let reply = GetGameResponse {
+                    creator: game.inner.creator.id.to_string(),
                     deck: game.inner.deck,
                     discard_id: game.inner.discard.id.to_string(),
                     id: game.id.id.to_string(),

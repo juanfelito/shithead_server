@@ -12,6 +12,7 @@ service Discard {
 
 service User {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+    rpc GetUser (GetUserRequest) returns (GetUserResponse);
 }
 
 message CreateGameRequest {
@@ -27,12 +28,13 @@ message GetGameRequest {
 }
 
 message GetGameResponse {
-    repeated string deck = 1;
-    string discard_id = 2;
-    string id = 3;
-    repeated uint32 players_out = 4;
-    string state = 5;
-    uint32 turn = 6;
+    string creator = 1;
+    repeated string deck = 2;
+    string discard_id = 3;
+    string id = 4;
+    repeated uint32 players_out = 5;
+    string state = 6;
+    uint32 turn = 7;
 }
 
 message GetDiscardRequest {
@@ -53,4 +55,13 @@ message CreateUserRequest {
 
 message CreateUserResponse {
     string id = 1;
+}
+
+message GetUserRequest {
+    string id = 1;
+}
+
+message GetUserResponse {
+    string id = 1;
+    string name = 2;
 }

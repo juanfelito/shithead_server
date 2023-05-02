@@ -1,4 +1,5 @@
 use anyhow::{Result, Error};
+use surrealdb::sql::Thing;
 use core::result::Result::Ok;
 use crate::models::discard::Discard;
 use crate::models::game::{Game, GameState};
@@ -28,7 +29,7 @@ impl GameMediator {
         }
     }
 
-    pub async fn create_game(&self) -> Result<WithId<Game>,Error> {
+    pub async fn create_game(&self, creator_id: &str) -> Result<WithId<Game>,Error> {
         println!("creating a new discard pile...");
         let discard: WithId<Discard> = self.repo.db.create("discard")
             .content(Discard{
@@ -42,6 +43,7 @@ impl GameMediator {
         println!("creating a new game...");
         let game: Result<WithId<Game>, surrealdb::Error> = self.repo.db.create("game")
             .content(Game{
+                creator: Thing::from(("user", creator_id)),
                 deck: vec![],
                 discard: discard.id,
                 players_out: vec![],

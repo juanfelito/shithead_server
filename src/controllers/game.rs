@@ -50,9 +50,9 @@ impl Game for GameService {
     ) -> Result<Response<CreateGameResponse>, Status > {
         println!("Got a create request: {:?}", request);
 
-        //let req = request.into_inner();
+        let req = request.into_inner();
 
-        let res = self.mediator.create_game().await;
+        let res = self.mediator.create_game(&req.creator).await;
 
         match res {
             Ok(created) => {

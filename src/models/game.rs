@@ -20,6 +20,7 @@ impl Into<String> for GameState {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Game {
+    pub creator: Thing,
     pub deck: Vec<String>,
     pub discard: Thing,
     pub players_out: Vec<u32>,

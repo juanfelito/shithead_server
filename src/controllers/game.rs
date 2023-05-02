@@ -57,7 +57,7 @@ impl Game for GameService {
         match res {
             Ok(created) => {
                 let reply = CreateGameResponse {
-                    id: created.id.to_string()
+                    id: created.id.id.to_string()
                 };
         
                 Ok(Response::new(reply))

@@ -14,5 +14,6 @@ pub struct WithId<T> {
 //     }
 // }
 
-pub mod game;
 pub mod discard;
+pub mod game;
+pub mod user;

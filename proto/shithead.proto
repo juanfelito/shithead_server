@@ -10,6 +10,10 @@ service Discard {
     rpc GetDiscard(GetDiscardRequest) returns (GetDiscardResponse);
 }
 
+service User {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+}
+
 message CreateGameRequest {
     string creator = 1;
 }
@@ -41,4 +45,12 @@ message GetDiscardResponse {
     string id = 3;
     uint32 repeat_count = 4;
     repeated string cards = 5;
+}
+
+message CreateUserRequest {
+    string name = 1;
+}
+
+message CreateUserResponse {
+    string id = 1;
 }

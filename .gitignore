@@ -18,4 +18,5 @@ Cargo.lock
 /target
 
 /shithead.db
+history.txt
 .DS_Store

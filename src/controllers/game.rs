@@ -29,6 +29,11 @@ impl Game for GameService {
         let res = self.mediator.get_game(req.id).await;
         match res {
             Ok(game) => {
+                let user_ids = game.inner.users.unwrap_or_default()
+                                    .iter()
+                                    .map(|u| u.id.to_string())
+                                    .collect();
+
                 let reply = GetGameResponse {
                     creator: game.inner.creator.id.to_string(),
                     deck: game.inner.deck,
@@ -37,6 +42,7 @@ impl Game for GameService {
                     players_out: game.inner.players_out,
                     state: game.inner.state.into(),
                     turn: game.inner.turn,
+                    users: user_ids,
                 };
                 Ok(Response::new(reply))
             }

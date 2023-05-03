@@ -14,7 +14,6 @@ impl DiscardMediator {
     }
 
     pub async fn get_discard(&self, game_id: String) -> Result<WithId<Discard>,Error> {
-        
         println!("trying to get discard by game id");
 
         let sql = format!("select discard from game:{} fetch discard", game_id);

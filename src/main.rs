@@ -31,13 +31,13 @@ async fn main() -> Result<()> {
     
     let game_mediator = GameMediator::new(repo.clone());
     let player_mediator = PlayerMediator::new(repo.clone());
-    let game_service = GameService::new(game_mediator, player_mediator);
+    let game_service = GameService::new(game_mediator, player_mediator.clone());
 
     let discard_mediator = DiscardMediator::new(repo.clone());
     let discard_service = DiscardService::new(discard_mediator);
 
     let user_mediator = UserMediator::new(repo.clone());
-    let user_service = UserService::new(user_mediator);
+    let user_service = UserService::new(user_mediator, player_mediator);
 
     Server::builder()
         .add_service(GameServer::new(game_service))

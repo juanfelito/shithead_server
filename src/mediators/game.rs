@@ -18,7 +18,9 @@ impl GameMediator {
 
     pub async fn get_game(&self, id: String) -> Result<WithId<Game>,Error> {
         println!("trying to get game by id");
-        let game: Option<WithId<Game>> = self.repo.db.select(("game", id)).await?;
+        let sql = format!("select *, <-player<-user as users from game:{}", &id);
+        let mut result = self.repo.db.query(sql).await?;
+        let game: Option<WithId<Game>> = result.take(0)?;
         match game {
             Some(game) => {
                 Ok(game)
@@ -49,6 +51,7 @@ impl GameMediator {
                 players_out: vec![],
                 state: GameState::Lobby,
                 turn: 0,
+                users: None,
             })
         .await;
 

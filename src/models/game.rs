@@ -26,4 +26,5 @@ pub struct Game {
     pub players_out: Vec<u32>,
     pub state: GameState,
     pub turn: u32,
+    pub users: Option<Vec<Thing>>,
 }

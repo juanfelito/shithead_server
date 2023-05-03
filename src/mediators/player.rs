@@ -1,5 +1,4 @@
 use anyhow::{Result, Error};
-use core::result::Result::Ok;
 use crate::models::game::{Game, GameState};
 use crate::models::player::{Player};
 use crate::models::WithId;
@@ -16,10 +15,7 @@ impl PlayerMediator {
     }
 
     pub async fn join_game(&self, game_id: String, user_id: String) -> Result<WithId<Player>, Error> {
-        println!("verifying before joining game...");
-        let sql = format!("select *, <-player<-user as users from game:{}", &game_id);
-        let mut result = self.repo.db.query(sql).await?;
-        let game_opt: Option<WithId<Game>> = result.take(0)?;
+        let game_opt: Option<WithId<Game>> = self.repo.get_game(game_id.clone()).await?;
         if game_opt.is_none() {
             return Err(Error::msg("game not found"));
         }
@@ -38,18 +34,8 @@ impl PlayerMediator {
         let turn = users.len();
         println!("joining game...");
 
-        let sql = format!("relate user:{}->player->game:{} content {{turn: {}, cards: {{hand: [], face_up: [], face_down: []}}}}", user_id, game_id, turn);
-        let mut result = self.repo.db.query(sql).await?;
-        let player: Option<WithId<Player>> = result.take(0)?;
-        
-        match player {
-            Some(player) => {
-                Ok(player)
-            }
-            None => {
-                Err(Error::msg("not found"))
-            }
-        }
-
+        self.repo.join_game(game_id, user_id, turn)
+                .await?
+                .ok_or(Error::msg("couldn't join game"))
     }
 }

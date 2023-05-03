@@ -54,7 +54,7 @@ impl User for UserService {
             }
             Err(err) => {
                 println!("{:?}", err);
-                Err(Status::not_found("couldn't find the requested game"))
+                Err(Status::not_found("couldn't find the requested user"))
             }
         }
     }

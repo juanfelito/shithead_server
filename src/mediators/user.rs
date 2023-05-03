@@ -15,33 +15,14 @@ impl UserMediator {
     }
 
     pub async fn get_user(&self, id: String) -> Result<WithId<User>,Error> {
-        println!("trying to get user by id");
-        let user: Option<WithId<User>> = self.repo.db.select(("user", id)).await?;
-        match user {
-            Some(user) => {
-                Ok(user)
-            }
-            None => {
-                Err(Error::msg("not found"))
-            }
-        }
+        self.repo.get_user(id)
+            .await?
+            .ok_or(Error::msg("not found"))
     }
 
-    pub async fn create_user(&self, name: String) -> Result<WithId<User>,Error> {
-        println!("creating a new user...");
-        let user: Result<WithId<User>, surrealdb::Error> = self.repo.db.create("user")
-            .content(User{
-                name
-            })
-        .await;
+    pub async fn create_user(&self, name: String) -> Result<WithId<User>, Error> {
+        let user: WithId<User> = self.repo.create_user(User { name }).await?;
 
-        match user {
-            Ok(user) => {
-                Ok(user)
-            }
-            Err(_) => {
-                Err(Error::msg("couldn't create new user"))
-            }
-        }
+        Ok(user)
     }
 }

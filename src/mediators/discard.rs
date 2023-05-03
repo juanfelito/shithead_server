@@ -1,7 +1,7 @@
 use anyhow::Error;
 use crate::repo::SurrealDBRepo;
 use crate::models::WithId;
-use crate::models::discard::{Discard, WrappedDiscard};
+use crate::models::discard::{Discard};
 
 #[derive(Debug)]
 pub struct DiscardMediator {
@@ -16,16 +16,8 @@ impl DiscardMediator {
     pub async fn get_discard(&self, game_id: String) -> Result<WithId<Discard>,Error> {
         println!("trying to get discard by game id");
 
-        let sql = format!("select discard from game:{} fetch discard", game_id);
-        let mut result = self.repo.db.query(sql).await?;
-        let discard: Option<WrappedDiscard> = result.take(0)?;
-        match discard {
-            Some(w_discard) => {
-                Ok(w_discard.discard)
-            }
-            None => {
-                Err(Error::msg("not found"))
-            }
-        }
+        self.repo.get_discard(game_id)
+                .await?
+                .ok_or(Error::msg("not found"))
     }
 }

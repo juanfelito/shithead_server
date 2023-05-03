@@ -1,7 +1,7 @@
 use crate::models::WithId;
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Discard {
     pub cards: Vec<String>,
     pub current_value: Option<String>,

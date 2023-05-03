@@ -2,15 +2,17 @@ use crate::shithead::game_server::{Game};
 use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::game::GameMediator;
+use crate::mediators::player::PlayerMediator;
 
 #[derive(Debug)]
 pub struct GameService {
-    mediator: GameMediator
+    mediator: GameMediator,
+    player_mediator: PlayerMediator
 }
 
 impl GameService {
-    pub fn new(mediator: GameMediator) -> Self {
-        GameService { mediator }
+    pub fn new(mediator: GameMediator, player_mediator: PlayerMediator) -> Self {
+        GameService { mediator, player_mediator }
     }
 }
 
@@ -57,6 +59,8 @@ impl Game for GameService {
 
         match res {
             Ok(created) => {
+                // TODO save result and add player id to the response
+                self.player_mediator.join_game(created.id.id.to_string(), req.creator).await;
                 let reply = CreateGameResponse {
                     id: created.id.id.to_string()
                 };

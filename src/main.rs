@@ -11,6 +11,7 @@ use controllers::user::UserService;
 
 use mediators::discard::DiscardMediator;
 use mediators::game::GameMediator;
+use mediators::player::PlayerMediator;
 use mediators::user::UserMediator;
 
 mod controllers;
@@ -29,7 +30,8 @@ async fn main() -> Result<()> {
     let addr = "[::1]:50051".parse()?;
     
     let game_mediator = GameMediator::new(repo.clone());
-    let game_service = GameService::new(game_mediator);
+    let player_mediator = PlayerMediator::new(repo.clone());
+    let game_service = GameService::new(game_mediator, player_mediator);
 
     let discard_mediator = DiscardMediator::new(repo.clone());
     let discard_service = DiscardService::new(discard_mediator);

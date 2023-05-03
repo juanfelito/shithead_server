@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use surrealdb::sql::Thing;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum GameState {
     Lobby,
     Started,

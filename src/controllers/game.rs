@@ -66,7 +66,7 @@ impl Game for GameService {
         match res {
             Ok(created) => {
                 // TODO save result and add player id to the response
-                self.player_mediator.join_game(created.id.id.to_string(), req.creator).await;
+                _ = self.player_mediator.join_game(created.id.id.to_string(), req.creator).await;
                 let reply = CreateGameResponse {
                     id: created.id.id.to_string()
                 };

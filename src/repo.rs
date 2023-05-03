@@ -70,4 +70,10 @@ impl SurrealDBRepo {
 
         self.db.query(sql).await?.take(0)
     }
+
+    pub async fn get_player(&self, game_id: String, user_id: String) -> Result<Option<WithId<Player>>, Error> {
+        let sql = format!("select * from player where <-(user where id = user:{}) and ->(game where id = game:{})", user_id, game_id);
+
+        self.db.query(sql).await?.take(0)
+    }
 }

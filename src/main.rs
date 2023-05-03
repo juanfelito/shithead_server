@@ -1,12 +1,14 @@
 use anyhow::{Result, Ok};
 use tonic::{transport::Server};
 
-use shithead::game_server::{GameServer};
 use shithead::discard_server::{DiscardServer};
+use shithead::game_server::{GameServer};
+use shithead::player_server::PlayerServer;
 use shithead::user_server::{UserServer};
 
 use controllers::discard::DiscardService;
 use controllers::game::GameService;
+use controllers::player::PlayerService;
 use controllers::user::UserService;
 
 use mediators::discard::DiscardMediator;
@@ -37,12 +39,15 @@ async fn main() -> Result<()> {
     let discard_service = DiscardService::new(discard_mediator);
 
     let user_mediator = UserMediator::new(repo.clone());
-    let user_service = UserService::new(user_mediator, player_mediator);
+    let user_service = UserService::new(user_mediator);
+
+    let player_service = PlayerService::new(player_mediator);
 
     Server::builder()
         .add_service(GameServer::new(game_service))
         .add_service(DiscardServer::new(discard_service))
         .add_service(UserServer::new(user_service))
+        .add_service(PlayerServer::new(player_service))
         .serve(addr)
         .await?;
 

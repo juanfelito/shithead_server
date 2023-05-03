@@ -13,6 +13,10 @@ service Discard {
 service User {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
     rpc GetUser (GetUserRequest) returns (GetUserResponse);
+}
+
+service Player {
+    rpc GetPlayer (GetPlayerRequest) returns (GetPlayerResponse);
     rpc JoinGame (JoinGameRequest) returns (JoinGameResponse);
 }
 
@@ -74,3 +78,20 @@ message JoinGameRequest {
 }
 
 message JoinGameResponse {}
+
+message GetPlayerRequest {
+    string game_id = 1;
+    string user_id = 2;
+}
+
+message Cards {
+    repeated string hand = 1;
+    repeated string face_up = 2;
+    repeated string face_down = 3;
+}
+
+message GetPlayerResponse {
+    string id = 1;
+    uint32 turn = 2;
+    Cards cards = 3;
+}

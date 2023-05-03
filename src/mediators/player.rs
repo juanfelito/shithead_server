@@ -38,4 +38,10 @@ impl PlayerMediator {
                 .await?
                 .ok_or(Error::msg("couldn't join game"))
     }
+
+    pub async fn get_player(&self, game_id: String, user_id: String) -> Result<WithId<Player>, Error> {
+        self.repo.get_player(game_id, user_id)
+                .await?
+                .ok_or(Error::msg("player not found"))
+    }
 }

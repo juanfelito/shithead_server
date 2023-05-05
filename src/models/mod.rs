@@ -8,11 +8,11 @@ pub struct WithId<T> {
     pub inner: T,
 }
 
-// impl<T> WithId<T> {
-//     fn new(id: Thing, inner: T) -> Self {
-//         Self { id, inner }
-//     }
-// }
+impl<T> WithId<T> {
+    pub fn new(id: Thing, inner: T) -> Self {
+        Self { id, inner }
+    }
+}
 
 pub mod discard;
 pub mod game;

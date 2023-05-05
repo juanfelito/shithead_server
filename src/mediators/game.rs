@@ -39,7 +39,7 @@ impl GameMediator {
     }
 
     pub async fn start_game(&self, user_id: String, game_id: String) -> Result<WithId<Game>, Error> {
-        let game: WithId<Game> = self.repo.get_game(game_id.clone())
+        let mut game: WithId<Game> = self.repo.get_game(game_id.clone())
                                         .await?
                                         .ok_or(Error::msg("game not found"))?;
         
@@ -59,17 +59,13 @@ impl GameMediator {
 
         let mut players = self.repo.get_players(game_id).await?;
 
-        println!("BEFORE");
-        println!("{:?}", deck);
-        for player in &players {
-            println!("{:?}", player.cards);
-        }
         self.dealer.initial_deal(&mut deck, &mut players);
-        println!("AFTER");
-        println!("{:?}", deck);
-        for player in &players {
-            println!("{:?}", player.cards);
-        }
-        Err(Error::msg("opps"))
+
+        game.inner.state = GameState::Started;
+        game.inner.deck = deck;
+        
+        self.repo.start_game(game, players)
+                .await?
+                .ok_or(Error::msg("couldn't start game"))
     }
 }

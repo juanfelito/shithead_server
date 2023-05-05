@@ -83,6 +83,13 @@ impl Game for GameService {
 
         let res = self.mediator.start_game(req.user_id, req.game_id).await;
 
-        Err(Status::unimplemented("oops"))
+        match res {
+            Ok(_) => {
+                Ok(Response::new(StartGameResponse{}))
+            }
+            Err(err) => {
+                Err(Status::internal(format!("could not start the game: {}", err.to_string())))
+            }
+        }
     }
 }

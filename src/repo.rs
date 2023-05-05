@@ -71,7 +71,7 @@ impl SurrealDBRepo {
         self.db.query(sql).await?.take(0)
     }
 
-    pub async fn get_players(&self, game_id: String) -> Result<Vec<Player>, Error> {
+    pub async fn get_players(&self, game_id: String) -> Result<Vec<WithId<Player>>, Error> {
         let sql = format!("select * from player where ->(game where id = game:{})", game_id);
 
         self.db.query(sql).await?.take(0)
@@ -81,5 +81,13 @@ impl SurrealDBRepo {
         let sql = format!("select * from player where <-(user where id = user:{}) and ->(game where id = game:{})", user_id, game_id);
 
         self.db.query(sql).await?.take(0)
+    }
+
+    pub async fn start_game(&self, game: WithId<Game>, players: Vec<WithId<Player>>) -> Result<Option<WithId<Game>>, Error> {
+        for player in players {
+            let _: Option<WithId<Player>> = self.db.update(("player", player.id.id)).content(player.inner).await?;
+        }
+
+        self.db.update(("game", game.id.id)).content(game.inner).await
     }
 }

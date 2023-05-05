@@ -17,9 +17,11 @@ use mediators::player::PlayerMediator;
 use mediators::user::UserMediator;
 
 mod controllers;
+mod dealer;
 mod mediators;
 mod models;
 mod repo;
+mod card_manager;
 
 pub mod shithead {
     tonic::include_proto!("shithead");
@@ -28,19 +30,21 @@ pub mod shithead {
 #[tokio::main]
 async fn main() -> Result<()> {
     let repo = repo::SurrealDBRepo::init().await?;
+    let card_manager = card_manager::CardManager::new();
+    let dealer = dealer::Dealer::new();
     
     let addr = "[::1]:50051".parse()?;
     
-    let game_mediator = GameMediator::new(repo.clone());
-    let player_mediator = PlayerMediator::new(repo.clone());
-    let game_service = GameService::new(game_mediator, player_mediator.clone());
-
+    let game_mediator = GameMediator::new(repo.clone(), card_manager, dealer);
+    let game_service = GameService::new(game_mediator);
+    
     let discard_mediator = DiscardMediator::new(repo.clone());
     let discard_service = DiscardService::new(discard_mediator);
-
+    
     let user_mediator = UserMediator::new(repo.clone());
     let user_service = UserService::new(user_mediator);
-
+    
+    let player_mediator = PlayerMediator::new(repo.clone());
     let player_service = PlayerService::new(player_mediator);
 
     Server::builder()

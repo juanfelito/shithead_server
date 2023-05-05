@@ -15,11 +15,9 @@ impl PlayerMediator {
     }
 
     pub async fn join_game(&self, game_id: String, user_id: String) -> Result<WithId<Player>, Error> {
-        let game_opt: Option<WithId<Game>> = self.repo.get_game(game_id.clone()).await?;
-        if game_opt.is_none() {
-            return Err(Error::msg("game not found"));
-        }
-        let game: WithId<Game> = game_opt.unwrap();
+        let game: WithId<Game> = self.repo.get_game(game_id.clone())
+                                        .await?
+                                        .ok_or(Error::msg("game not found"))?;
 
         let users = game.inner.users.unwrap_or_default();
         let already_joined = users.iter().any(|u| u.id.to_string() == user_id);

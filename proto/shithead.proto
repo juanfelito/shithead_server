@@ -4,6 +4,7 @@ package shithead;
 service Game {
     rpc CreateGame (CreateGameRequest) returns (CreateGameResponse);
     rpc GetGame (GetGameRequest) returns (GetGameResponse);
+    rpc StartGame (StartGameRequest) returns (StartGameResponse);
 }
 
 service Discard {
@@ -95,3 +96,10 @@ message GetPlayerResponse {
     uint32 turn = 2;
     Cards cards = 3;
 }
+
+message StartGameRequest {
+    string user_id = 1;
+    string game_id = 2;
+}
+
+message StartGameResponse {}

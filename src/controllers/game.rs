@@ -1,18 +1,16 @@
 use crate::shithead::game_server::{Game};
-use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse};
+use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse, StartGameRequest, StartGameResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::game::GameMediator;
-use crate::mediators::player::PlayerMediator;
 
 #[derive(Debug)]
 pub struct GameService {
-    mediator: GameMediator,
-    player_mediator: PlayerMediator
+    mediator: GameMediator
 }
 
 impl GameService {
-    pub fn new(mediator: GameMediator, player_mediator: PlayerMediator) -> Self {
-        GameService { mediator, player_mediator }
+    pub fn new(mediator: GameMediator) -> Self {
+        GameService { mediator }
     }
 }
 
@@ -65,8 +63,6 @@ impl Game for GameService {
 
         match res {
             Ok(created) => {
-                // TODO save result and add player id to the response
-                _ = self.player_mediator.join_game(created.id.id.to_string(), req.creator).await;
                 let reply = CreateGameResponse {
                     id: created.id.id.to_string()
                 };
@@ -77,5 +73,16 @@ impl Game for GameService {
                 Err(Status::internal("could not create a new game"))
             }
         }
+    }
+
+    async fn start_game(
+        &self,
+        request: Request<StartGameRequest>
+    ) -> Result<Response<StartGameResponse>, Status> {
+        let req = request.into_inner();
+
+        let res = self.mediator.start_game(req.user_id, req.game_id).await;
+
+        Err(Status::unimplemented("oops"))
     }
 }

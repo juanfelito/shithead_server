@@ -1,3 +1,4 @@
+use crate::mediators::MediatorError;
 use crate::shithead::discard_server::{Discard};
 use crate::shithead::{GetDiscardRequest, GetDiscardResponse};
 use tonic::{Request, Response, Status};
@@ -36,9 +37,13 @@ impl Discard for DiscardService {
                 };
                 Ok(Response::new(reply))
             }
-            Err(err) => {
-                println!("{:?}", err);
-                Err(Status::not_found("couldn't find the requested game"))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into());
+                }
+                _ => {
+                    Err(Status::internal(err.to_string()))
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ use crate::shithead::game_server::{Game};
 use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse, StartGameRequest, StartGameResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::game::GameMediator;
+use crate::mediators::{MediatorError};
 
 #[derive(Debug)]
 pub struct GameService {
@@ -44,9 +45,13 @@ impl Game for GameService {
                 };
                 Ok(Response::new(reply))
             }
-            Err(err) => {
-                println!("{:?}", err);
-                Err(Status::not_found("couldn't find the requested game"))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(MediatorError::NotFound(_)) => {
+                    return Err(Status::not_found(format!("{}: couldn't find the requested game", err)));
+                }
+                _ => {
+                    Err(Status::internal(err.to_string()))
+                }
             }
         }
     }
@@ -69,8 +74,10 @@ impl Game for GameService {
         
                 Ok(Response::new(reply))
             }
-            Err(_) => {
-                Err(Status::internal("could not create a new game"))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                _ => {
+                    Err(Status::internal(err.to_string()))
+                }
             }
         }
     }
@@ -87,8 +94,13 @@ impl Game for GameService {
             Ok(_) => {
                 Ok(Response::new(StartGameResponse{}))
             }
-            Err(err) => {
-                Err(Status::internal(format!("could not start the game: {}", err.to_string())))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into())
+                }
+                _ => {
+                    Err(Status::internal(format!("Could not start the game: {}", err.to_string())))
+                }
             }
         }
     }

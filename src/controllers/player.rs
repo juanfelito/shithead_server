@@ -1,6 +1,7 @@
 use crate::shithead::player_server::{Player};
 use crate::shithead::{JoinGameRequest, JoinGameResponse, GetPlayerRequest, GetPlayerResponse};
 use tonic::{Request, Response, Status};
+use crate::mediators::MediatorError;
 use crate::mediators::player::PlayerMediator;
 
 #[derive(Debug)]
@@ -27,8 +28,13 @@ impl Player for PlayerService {
         let res = self.mediator.join_game(req.game_id, req.user_id).await;
         match res {
             Ok(_) => { Ok(Response::new(JoinGameResponse{})) }
-            Err(err) => {
-                Err(Status::already_exists(format!("couldn't join the requested game: {}", err.to_string())))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into());
+                }
+                _ => {
+                    Err(Status::internal(format!("Could not join the game: {}", err.to_string())))
+                }
             }
         }
     }
@@ -52,8 +58,13 @@ impl Player for PlayerService {
                 };
                 Ok(Response::new(reply))
             }
-            Err(err) => {
-                Err(Status::not_found(format!("couldn't find the player for that game and user id: {}", err.to_string())))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into());
+                }
+                _ => {
+                    Err(Status::internal(err.to_string()))
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 use crate::shithead::user_server::{User};
 use crate::shithead::{CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse};
 use tonic::{Request, Response, Status};
+use crate::mediators::MediatorError;
 use crate::mediators::user::UserMediator;
 
 #[derive(Debug)]
@@ -33,9 +34,13 @@ impl User for UserService {
                 };
                 Ok(Response::new(reply))
             }
-            Err(err) => {
-                println!("{:?}", err);
-                Err(Status::not_found("couldn't find the requested user"))
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into());
+                }
+                _ => {
+                    Err(Status::internal(err.to_string()))
+                }
             }
         }
     }
@@ -58,8 +63,8 @@ impl User for UserService {
         
                 Ok(Response::new(reply))
             }
-            Err(_) => {
-                Err(Status::internal("could not create a new user"))
+            Err(err) => {
+                Err(Status::internal(format!("Could not create a new user: {}", err.to_string())))
             }
         }
     }

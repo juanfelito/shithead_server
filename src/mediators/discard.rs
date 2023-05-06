@@ -1,7 +1,9 @@
-use anyhow::Error;
+use anyhow::{anyhow, Error};
 use crate::repo::SurrealDBRepo;
 use crate::models::WithId;
 use crate::models::discard::{Discard};
+
+use super::MediatorError;
 
 #[derive(Debug)]
 pub struct DiscardMediator {
@@ -14,10 +16,8 @@ impl DiscardMediator {
     }
 
     pub async fn get_discard(&self, game_id: String) -> Result<WithId<Discard>,Error> {
-        println!("trying to get discard by game id");
-
         self.repo.get_discard(game_id)
                 .await?
-                .ok_or(Error::msg("not found"))
+                .ok_or(anyhow!(MediatorError::NotFound("Discard not found".to_string())))
     }
 }

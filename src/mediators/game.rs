@@ -1,10 +1,12 @@
-use anyhow::{Result, Error};
+use anyhow::{anyhow, Result, Error};
 use core::result::Result::Ok;
 use crate::card_manager::CardManager;
 use crate::dealer::Dealer;
 use crate::models::game::{Game, GameState};
 use crate::models::WithId;
 use crate::repo::SurrealDBRepo;
+
+use super::MediatorError;
 
 #[derive(Debug)]
 pub struct GameMediator {
@@ -21,7 +23,7 @@ impl GameMediator {
     pub async fn get_game(&self, id: String) -> Result<WithId<Game>, Error> {
         self.repo.get_game(id)
             .await?
-            .ok_or(Error::msg("not found"))
+            .ok_or(anyhow!(MediatorError::NotFound("Not found".to_string())))
     }
 
     pub async fn create_game(&self, creator_id: &str) -> Result<WithId<Game>, Error> {
@@ -41,19 +43,19 @@ impl GameMediator {
     pub async fn start_game(&self, user_id: String, game_id: String) -> Result<WithId<Game>, Error> {
         let mut game: WithId<Game> = self.repo.get_game(game_id.clone())
                                         .await?
-                                        .ok_or(Error::msg("game not found"))?;
+                                        .ok_or(anyhow!(MediatorError::NotFound("Game not found".to_string())))?;
         
         if game.inner.creator.id.to_string() != user_id {
-            return Err(Error::msg("unauthorized"));
+            return Err(anyhow!(MediatorError::Unauthorized("Only the creator can start the game".to_string())));
         }
 
         if game.inner.state != GameState::Lobby {
-            return Err(Error::msg("game already started"));
+            return Err(anyhow!(MediatorError::AlreadyExists("Game already started".to_string())));
         }
 
         game.inner.users.as_ref().map(Vec::len)
                         .filter(|&len| len > 1)
-                        .ok_or(Error::msg("not enough players in lobby, you need at least 2"))?;
+                        .ok_or(anyhow!(MediatorError::Unavailable("Not enough players in lobby, at least 2 required".to_string())))?;
 
         let mut deck = self.card_manager.new_deck(1);
 
@@ -66,6 +68,6 @@ impl GameMediator {
         
         self.repo.start_game(game, players)
                 .await?
-                .ok_or(Error::msg("couldn't start game"))
+                .ok_or(anyhow!(MediatorError::Internal("Couldn't start the game".to_string())))
     }
 }

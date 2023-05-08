@@ -1,11 +1,19 @@
 use crate::models::{player::{Player}, WithId};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Dealer {}
 
 impl Dealer {
     pub fn new() -> Self {
         Self{}
+    }
+
+    pub fn get_active_cards<'a>(&self, player: &'a mut Player) -> &'a mut Vec<String> {
+        match (player.cards.hand.len() > 0, player.cards.face_up.len() > 0) {
+            (true, _) => return &mut player.cards.hand,
+            (_, true) => return &mut player.cards.face_up,
+            _ => return &mut player.cards.face_down,
+        }
     }
 
     pub fn initial_deal(&self, deck: &mut Vec<String>, players: &mut Vec<WithId<Player>>) {

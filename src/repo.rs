@@ -90,4 +90,20 @@ impl SurrealDBRepo {
 
         self.db.update(("game", game.id.id)).content(game.inner).await
     }
+
+    pub async fn get_player_and_game(
+        &self, player_id: String
+    ) -> Result<(Option<WithId<Player>>, Option<WithId<Game>>), Error> {
+        let sql = format!(
+            "select *, <-player<-user as users from game where <-(player where id = player:{}); select * from player:{};",
+            player_id, player_id
+        );
+
+        let mut res = self.db.query(sql).await?;
+
+        let game = res.take(0)?;
+        let player = res.take(1)?;
+
+        Ok((player, game))
+    }
 }

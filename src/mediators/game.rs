@@ -65,6 +65,7 @@ impl GameMediator {
 
         game.inner.state = GameState::Started;
         game.inner.deck = deck;
+        game.inner.users = None;
         
         self.repo.start_game(game, players)
                 .await?

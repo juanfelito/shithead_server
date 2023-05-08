@@ -12,6 +12,7 @@ pub enum MediatorError {
     Unavailable(String),
     AlreadyExists(String),
     Internal(String),
+    InvalidArgument(String),
 }
 
 impl std::fmt::Display for MediatorError {
@@ -22,6 +23,7 @@ impl std::fmt::Display for MediatorError {
             Self::Unavailable(msg) => write!(f, "{}", msg),
             Self::AlreadyExists(msg) => write!(f, "{}", msg),
             Self::Internal(msg) => write!(f, "{}", msg),
+            Self::InvalidArgument(msg) => write!(f, "{}", msg),
         }
     }
 }
@@ -45,6 +47,9 @@ impl Into<Status> for &MediatorError {
             }
             MediatorError::Internal(str) => {
                 Status::internal(format!("Internal error: {}", str))
+            }
+            MediatorError::InvalidArgument(str) => {
+                Status::invalid_argument(format!("Invalid argument: {}", str))
             }
         }
     }

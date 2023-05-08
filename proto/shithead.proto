@@ -19,6 +19,7 @@ service User {
 service Player {
     rpc GetPlayer (GetPlayerRequest) returns (GetPlayerResponse);
     rpc JoinGame (JoinGameRequest) returns (JoinGameResponse);
+    rpc Play (PlayRequest) returns (PlayResponse);
 }
 
 message CreateGameRequest {
@@ -103,3 +104,13 @@ message StartGameRequest {
 }
 
 message StartGameResponse {}
+
+message PlayRequest {
+    string player_id = 1;
+    repeated string cards = 2;
+}
+
+message PlayResponse {
+    repeated string cards = 1;
+    bool turn_ended = 2;
+}

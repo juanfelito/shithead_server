@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
     
     let addr = "[::1]:50051".parse()?;
     
-    let game_mediator = GameMediator::new(repo.clone(), card_manager, dealer);
+    let game_mediator = GameMediator::new(repo.clone(), card_manager, dealer.clone());
     let game_service = GameService::new(game_mediator);
     
     let discard_mediator = DiscardMediator::new(repo.clone());
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     let user_mediator = UserMediator::new(repo.clone());
     let user_service = UserService::new(user_mediator);
     
-    let player_mediator = PlayerMediator::new(repo.clone());
+    let player_mediator = PlayerMediator::new(repo.clone(), dealer);
     let player_service = PlayerService::new(player_mediator);
 
     Server::builder()

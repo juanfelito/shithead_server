@@ -1,14 +1,10 @@
-use crate::models::{player::{Player}, WithId};
+use crate::{models::{player::{Player}, WithId}, card_manager::Card};
 
 #[derive(Debug, Clone)]
 pub struct Dealer {}
 
 impl Dealer {
-    pub fn new() -> Self {
-        Self{}
-    }
-
-    pub fn get_active_cards<'a>(&self, player: &'a mut Player) -> &'a mut Vec<String> {
+    pub fn get_active_cards<'a>(player: &'a mut Player) -> &'a mut Vec<String> {
         match (player.cards.hand.len() > 0, player.cards.face_up.len() > 0) {
             (true, _) => return &mut player.cards.hand,
             (_, true) => return &mut player.cards.face_up,
@@ -16,7 +12,17 @@ impl Dealer {
         }
     }
 
-    pub fn initial_deal(&self, deck: &mut Vec<String>, players: &mut Vec<WithId<Player>>) {
+    pub fn of_the_same_value(cards: &Vec<Card>) -> bool {
+        if let Some(first_value) = cards.get(0).map(|c| c.value) {
+            if !cards.iter().map(|c| c.value).all(|v| v == first_value) {
+                return false
+            }
+        }
+
+        true
+    }
+
+    pub fn initial_deal(deck: &mut Vec<String>, players: &mut Vec<WithId<Player>>) {
         Self::put_in_bucket(deck, players, CardBucket::FaceDown);
         Self::put_in_bucket(deck, players, CardBucket::FaceUp);
         Self::put_in_bucket(deck, players, CardBucket::Hand);

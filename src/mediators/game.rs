@@ -12,12 +12,11 @@ use super::MediatorError;
 pub struct GameMediator {
     repo: SurrealDBRepo,
     card_manager: CardManager,
-    dealer: Dealer
 }
 
 impl GameMediator {
-    pub fn new(repo: SurrealDBRepo, card_manager: CardManager, dealer: Dealer) -> Self {
-        GameMediator { repo, card_manager, dealer }
+    pub fn new(repo: SurrealDBRepo, card_manager: CardManager) -> Self {
+        GameMediator { repo, card_manager }
     }
 
     pub async fn get_game(&self, id: String) -> Result<WithId<Game>, Error> {
@@ -61,7 +60,7 @@ impl GameMediator {
 
         let mut players = self.repo.get_players(game_id).await?;
 
-        self.dealer.initial_deal(&mut deck, &mut players);
+        Dealer::initial_deal(&mut deck, &mut players);
 
         game.inner.state = GameState::Started;
         game.inner.deck = deck;

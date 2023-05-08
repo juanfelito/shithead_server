@@ -5,16 +5,16 @@ use crate::models::player::{Player};
 use crate::models::WithId;
 use crate::repo::SurrealDBRepo;
 use super::MediatorError;
+use crate::card_manager::Card;
 
 #[derive(Debug)]
 pub struct PlayerMediator {
-    repo: SurrealDBRepo,
-    dealer: Dealer
+    repo: SurrealDBRepo
 }
 
 impl PlayerMediator {
-    pub fn new(repo: SurrealDBRepo, dealer: Dealer) -> Self {
-        PlayerMediator { repo, dealer }
+    pub fn new(repo: SurrealDBRepo) -> Self {
+        PlayerMediator { repo }
     }
 
     pub async fn play(&self, player_id: String, chosen_cards: Vec<String>) -> Result<(), Error> {
@@ -27,9 +27,7 @@ impl PlayerMediator {
             return Err(anyhow!(MediatorError::Unavailable("It's not this player's turn".to_string())));
         }
 
-        let cards = self.dealer.get_active_cards(&mut player.inner);
-
-        println!("cards before: {:?}", cards);
+        let cards = Dealer::get_active_cards(&mut player.inner);
 
         let mut cards_to_check = vec![];
         for chosen_card in &chosen_cards {
@@ -44,9 +42,12 @@ impl PlayerMediator {
         if cards_to_check.len() != chosen_cards.len() {
             return Err(anyhow!(MediatorError::InvalidArgument("The player doesn't have one or more of the cards sent, or they are not active in this turn".to_string())));
         }
-        
-        println!("cards after: {:?}", cards);
-        println!("cards from hand that matched: {:?}", cards_to_check);
+
+        let play_cards: Vec<Card> = cards_to_check.iter().map(|c| Card::parse_card(c).unwrap()).collect();
+
+        if !Dealer::of_the_same_value(&play_cards) {
+            return Err(anyhow!(MediatorError::InvalidArgument("All played cards must have the same value!".to_string())));
+        }
 
         Ok(())
     }                           

@@ -25,8 +25,8 @@ impl Suit {
     }
 }
 
-#[derive(Debug, EnumIter, PartialEq, Clone)]
-enum CardValue {
+#[derive(Debug, EnumIter, PartialEq, Clone, Copy)]
+pub enum CardValue {
     Two,
     Three,
     Four,
@@ -63,22 +63,55 @@ impl CardValue {
 }
 
 #[derive(PartialEq, Clone, Debug)]
-struct Card {
+pub struct Card {
     pub value: CardValue,
-    pub suit: Suit,
+    suit: Suit,
     pub short_name: String,
     pub num_value: i8,
 }
 
 impl Card {
-    fn new(value: CardValue, suit: Suit) -> Self {
-        let (str_value, num_value) = value.str_num_value();
-        Card {
-            short_name: String::from(str_value) + &String::from(suit.icon()),
-            num_value: num_value,
-            value: value,
-            suit: suit,
-        }
+    pub fn parse_card(input: &str) -> Option<Card> {
+        let mut chars = input.chars();
+    
+        let value = match chars.next()? {
+            'A' => CardValue::Ace,
+            '2' => CardValue::Two,
+            '3' => CardValue::Three,
+            '4' => CardValue::Four,
+            '5' => CardValue::Five,
+            '6' => CardValue::Six,
+            '7' => CardValue::Seven,
+            '8' => CardValue::Eight,
+            '9' => CardValue::Nine,
+            '1' => {
+                if chars.next() != Some('0') {
+                    return None;
+                }
+                CardValue::Ten
+            },
+            'J' => CardValue::Jack,
+            'Q' => CardValue::Queen,
+            'K' => CardValue::King,
+            _ => return None,
+        };
+    
+        let suit = match chars.next()? {
+            '♠' => Suit::Spades,
+            '♣' => Suit::Clubs,
+            '♥' => Suit::Hearts,
+            '♦' => Suit::Diamonds,
+            _ => return None,
+        };
+    
+        let (_, num_value) = value.str_num_value();
+    
+        Some(Card {
+            value,
+            short_name: input.to_string(),
+            num_value,
+            suit
+        })
     }
 
     fn can_be_played_on(&self, current_value: &Option<CardValue>) -> bool {

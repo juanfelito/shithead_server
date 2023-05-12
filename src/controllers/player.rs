@@ -27,7 +27,9 @@ impl Player for PlayerService {
         let res = self.mediator.play(req.player_id, req.cards).await;
 
         match res {
-            Ok(_) => { Ok(Response::new(PlayResponse { cards: vec![], turn_ended: false })) }
+            Ok((cards, message, burned)) => { 
+                Ok(Response::new(PlayResponse { cards, turn_ended: !burned, message })) 
+            }
             Err(err) => match err.downcast_ref::<MediatorError>() {
                 Some(err) => {
                     return Err(err.into());

@@ -1,9 +1,85 @@
-use crate::{models::{player::{Player}, WithId}, card_manager::Card};
+use crate::{models::{player::{Player}, WithId, discard::Discard, game::Game}, card_manager::{Card, CardValue}};
 
 #[derive(Debug, Clone)]
 pub struct Dealer {}
 
 impl Dealer {
+    pub fn successful_play<'a>(
+        discard: &'a mut Discard,
+        successful_cards: &'a mut Vec<String>
+    ) {
+        let discard_value = CardValue::parse(discard.current_value.clone());
+        let played_value = Card::parse_card(&successful_cards[0]).expect("there's always a card").value;
+
+        if discard_value == Some(played_value) {
+            discard.repeat_count += successful_cards.len() as u32;
+        } else {
+            discard.repeat_count = successful_cards.len() as u32;
+        }
+
+        if played_value != CardValue::Three {
+            discard.current_value = Some(played_value.str_num_value().0);
+        }
+
+        discard.cards.append(successful_cards);
+        discard.current_card = discard.cards.last().cloned();
+    }
+
+    pub fn unsuccessful_play<'a>(
+        player: &'a mut Player,
+        discard: &'a mut Discard,
+        mut unsuccessful_cards: &'a mut Vec<String>
+    ) -> Vec<String> {
+        let picked_cards = discard.cards.clone();
+        player.cards.hand.append(&mut unsuccessful_cards);
+        player.cards.hand.append(&mut discard.cards);
+
+        Self::reset_discard_counters(discard);
+        picked_cards
+    }
+
+    pub fn burn_discard<'a>(discard: &'a mut Discard) {
+        discard.cards = vec![];
+        Self::reset_discard_counters(discard);
+    }
+
+    fn reset_discard_counters<'a>(discard: &'a mut Discard) {
+        discard.current_card = None;
+        discard.current_value = None;
+        discard.repeat_count = 0;
+    }
+
+    pub fn take_from_deck<'a>(player: &'a mut Player, deck: &'a mut Vec<String>) -> Vec<String> {
+        let mut response = vec![];
+        if deck.len() > 0 {
+            let player_hand = &mut player.cards.hand;
+            while player_hand.len() < 3 && deck.len() > 0 {
+                let card = deck.pop().unwrap();
+                response.push(card.clone());
+                player_hand.push(card);
+            }
+        }
+
+        response
+    }
+
+    pub fn tick_turn<'a>(game: &'a mut Game) {
+        if game.turn < (game.users.as_ref().unwrap().len() - 1) as u32 {
+            game.turn += 1;
+        } else {
+            game.turn = 0;
+        }
+
+        if game.players_out.contains(&game.turn) {
+            Self::tick_turn(game)
+        }
+    }
+
+    pub fn is_empty<'a>(player: &'a Player) -> bool {
+        let cards = &player.cards;
+        cards.hand.is_empty() && cards.face_up.is_empty() && cards.face_down.is_empty()
+    }
+
     pub fn get_active_cards<'a>(player: &'a mut Player) -> &'a mut Vec<String> {
         match (player.cards.hand.len() > 0, player.cards.face_up.len() > 0) {
             (true, _) => return &mut player.cards.hand,

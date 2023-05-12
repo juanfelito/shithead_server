@@ -113,4 +113,5 @@ message PlayRequest {
 message PlayResponse {
     repeated string cards = 1;
     bool turn_ended = 2;
+    string message = 3;
 }

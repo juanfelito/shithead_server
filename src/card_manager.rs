@@ -1,7 +1,7 @@
 use rand::thread_rng;
 use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
-use strum_macros::EnumIter;
+use strum_macros::{Display, EnumIter};
 
 const ALL_POWERFUL_MAGIC_CARDS: &[CardValue] = &[CardValue::Two, CardValue::Three, CardValue::Seven];
 const MAGIC_CARDS: &[CardValue] = &[CardValue::Ten, CardValue::Ace];
@@ -25,7 +25,7 @@ impl Suit {
     }
 }
 
-#[derive(Debug, EnumIter, PartialEq, Clone, Copy)]
+#[derive(Debug, Display, EnumIter, PartialEq, Clone, Copy)]
 pub enum CardValue {
     Two,
     Three,
@@ -43,7 +43,7 @@ pub enum CardValue {
 }
 
 impl CardValue {
-    fn str_num_value(&self) -> (String, i8) {
+    pub fn str_num_value(&self) -> (String, i8) {
         match self {
             CardValue::Ace => (String::from("A"), 14),
             CardValue::Two => (String::from("2"), 2),
@@ -59,6 +59,25 @@ impl CardValue {
             CardValue::Queen => (String::from("Q"), 12),
             CardValue::King => (String::from("K"), 13),
         }
+    }
+
+    pub fn parse(value_str: Option<String>) -> Option<CardValue> {
+        value_str.and_then(|s| match s.as_str() {
+            "2" => Some(CardValue::Two),
+            "3" => Some(CardValue::Three),
+            "4" => Some(CardValue::Four),
+            "5" => Some(CardValue::Five),
+            "6" => Some(CardValue::Six),
+            "7" => Some(CardValue::Seven),
+            "8" => Some(CardValue::Eight),
+            "9" => Some(CardValue::Nine),
+            "10" => Some(CardValue::Ten),
+            "J" => Some(CardValue::Jack),
+            "Q" => Some(CardValue::Queen),
+            "K" => Some(CardValue::King),
+            "A" => Some(CardValue::Ace),
+            _ => None,
+        })
     }
 }
 
@@ -114,7 +133,7 @@ impl Card {
         })
     }
 
-    fn can_be_played_on(&self, current_value: &Option<CardValue>) -> bool {
+    pub fn can_be_played_on(&self, current_value: &Option<CardValue>) -> bool {
         if ALL_POWERFUL_MAGIC_CARDS.contains(&self.value) {
             return true
         }

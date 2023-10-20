@@ -106,4 +106,27 @@ impl SurrealDBRepo {
 
         Ok((player, game))
     }
+
+    pub async fn commit_play(
+        &self, game: WithId<Game>, discard: WithId<Discard>, player: WithId<Player>
+    ) -> Option<Error> {
+        let game_result: Result<Option<WithId<Game>>, Error>;
+        let player_result: Result<Option<WithId<Player>>, Error>;
+        let discard_result: Result<Option<WithId<Discard>>, Error>;
+
+        game_result = self.db.update(("game", game.id.id)).content(game.inner).await;
+        if game_result.is_err() {
+            return game_result.err()
+        }
+        player_result = self.db.update(("player", player.id.id)).content(player.inner).await;
+        if player_result.is_err() {
+            return player_result.err()
+        }
+        discard_result = self.db.update(("discard", discard.id.id)).content(discard.inner).await;
+        if discard_result.is_err() {
+            return discard_result.err()
+        }
+
+        None
+    }
 }

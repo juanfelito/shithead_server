@@ -25,6 +25,19 @@ impl PlayerMediator {
         let mut player = player.ok_or(anyhow!(MediatorError::NotFound("Player not found".to_string())))?;
         let mut game = game.ok_or(anyhow!(MediatorError::NotFound("Game not found".to_string())))?;
 
+        match game.inner.state {
+            GameState::Lobby => {
+                return Err(anyhow!(MediatorError::Unavailable("The game hasn't started yet!".to_string())));
+            },
+            GameState::Finished => {
+                if !Dealer::is_empty(&player.inner) {
+                    return Err(anyhow!(MediatorError::Unavailable("You're a S H I T H E A D ! !".to_string())));
+                }
+                return Err(anyhow!(MediatorError::Unavailable("The game is over!".to_string())));
+            },
+            _ => {}
+        }
+        
         if game.inner.turn != player.inner.turn {
             return Err(anyhow!(MediatorError::Unavailable("It's not this player's turn".to_string())));
         }
@@ -79,6 +92,12 @@ impl PlayerMediator {
             cards_added_to_player = Dealer::take_from_deck(&mut player.inner, &mut game.inner.deck);
             if Dealer::is_empty(&player.inner) {
                 game.inner.players_out.push(player.inner.turn);
+                message = "Congratulations, you're not a shithead!".to_string();
+
+                if game.inner.players_out.len() == game.inner.users.as_ref().unwrap().len() - 1 {
+                    message = "The game is over, congratulations, you're not a shithead!".to_string();
+                    game.inner.state = GameState::Finished;
+                }
             }
         }
 
@@ -86,9 +105,10 @@ impl PlayerMediator {
             Dealer::tick_turn(&mut game.inner);
         }
 
-        game.inner.users = None;
-
-        // commit changes
+        let err = self.repo.commit_play(game, discard, player).await;
+        if err.is_some() {
+            return Err(anyhow!(MediatorError::Internal("Error saving your play".to_string())));
+        }
 
         Ok((cards_added_to_player, message, burned))
     }                           

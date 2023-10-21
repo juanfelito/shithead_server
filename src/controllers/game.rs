@@ -34,7 +34,7 @@ impl Game for GameService {
                                     .collect();
 
                 let reply = GetGameResponse {
-                    creator: game.inner.creator.id.to_string(),
+                    creator_id: game.inner.creator.id.to_string(),
                     deck: game.inner.deck,
                     discard_id: game.inner.discard.id.to_string(),
                     id: game.id.id.to_string(),

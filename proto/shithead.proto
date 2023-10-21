@@ -35,7 +35,7 @@ message GetGameRequest {
 }
 
 message GetGameResponse {
-    string creator = 1;
+    string creator_id = 1;
     repeated string deck = 2;
     string discard_id = 3;
     string id = 4;

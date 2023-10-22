@@ -1,4 +1,4 @@
-use crate::shithead::user_server::{User};
+use crate::shithead::user_server::User;
 use crate::shithead::{CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::MediatorError;

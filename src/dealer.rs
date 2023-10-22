@@ -1,4 +1,4 @@
-use crate::{models::{player::{Player}, WithId, discard::Discard, game::Game}, card_manager::{Card, CardValue}};
+use crate::{models::{player::Player, WithId, discard::Discard, game::Game}, card_manager::{Card, CardValue}};
 
 #[derive(Debug, Clone)]
 pub struct Dealer {}

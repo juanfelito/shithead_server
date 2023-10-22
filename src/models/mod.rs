@@ -1,4 +1,4 @@
-use surrealdb::sql::{Thing};
+use surrealdb::sql::Thing;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]

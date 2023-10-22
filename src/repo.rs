@@ -2,7 +2,7 @@ use std::sync::Arc;
 use surrealdb::Surreal;
 use surrealdb::engine::local::{Db, File};
 use surrealdb::sql::Thing;
-use surrealdb::{Error};
+use surrealdb::Error;
 
 use crate::models::WithId;
 use crate::models::discard::{Discard, WrappedDiscard};

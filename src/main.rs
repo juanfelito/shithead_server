@@ -1,10 +1,10 @@
 use anyhow::{Result, Ok};
-use tonic::{transport::Server};
+use tonic::transport::Server;
 
-use shithead::discard_server::{DiscardServer};
-use shithead::game_server::{GameServer};
+use shithead::discard_server::DiscardServer;
+use shithead::game_server::GameServer;
 use shithead::player_server::PlayerServer;
-use shithead::user_server::{UserServer};
+use shithead::user_server::UserServer;
 
 use controllers::discard::DiscardService;
 use controllers::game::GameService;

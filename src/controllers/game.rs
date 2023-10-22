@@ -1,8 +1,8 @@
-use crate::shithead::game_server::{Game};
+use crate::shithead::game_server::Game;
 use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse, StartGameRequest, StartGameResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::game::GameMediator;
-use crate::mediators::{MediatorError};
+use crate::mediators::MediatorError;
 
 #[derive(Debug)]
 pub struct GameService {

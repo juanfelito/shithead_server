@@ -1,5 +1,5 @@
-use crate::shithead::player_server::{Player};
-use crate::shithead::{JoinGameRequest, JoinGameResponse, GetPlayerRequest, GetPlayerResponse, PlayRequest, PlayResponse};
+use crate::shithead::player_server::Player;
+use crate::shithead::{JoinGameRequest, JoinGameResponse, GetPlayerRequest, GetPlayerResponse, PlayRequest, PlayResponse, GetOpponentsRequest, GetOpponentsResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::MediatorError;
 use crate::mediators::player::PlayerMediator;
@@ -57,6 +57,40 @@ impl Player for PlayerService {
                 }
                 _ => {
                     Err(Status::internal(format!("Could not join the game: {}", err.to_string())))
+                }
+            }
+        }
+    }
+
+    async fn get_oponents(
+        &self,
+        request: Request<GetOpponentsRequest>
+    ) -> Result<Response<GetOpponentsResponse>, Status> {
+        println!("got a get opponents request: {:?}", request);
+        let req = request.into_inner();
+
+        let res = self.mediator.get_opponents(req.game_id, req.player_id).await;
+
+        match res {
+            Ok(players) => {
+                let others = players.iter().map(|p| {
+                    GetPlayerResponse {
+                        id: p.id.id.to_string(),
+                        turn: p.inner.turn,
+                        cards: p.inner.cards.clone().into(),
+                    }
+                }).collect();
+                let reply = GetOpponentsResponse {
+                    opponents: others
+                };
+                Ok(Response::new(reply))
+            }
+            Err(err) => match err.downcast_ref::<MediatorError>() {
+                Some(err) => {
+                    return Err(err.into());
+                }
+                _ => {
+                    Err(Status::internal(err.to_string()))
                 }
             }
         }

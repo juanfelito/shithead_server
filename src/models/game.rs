@@ -1,6 +1,8 @@
 use serde::{Serialize, Deserialize};
 use surrealdb::sql::Thing;
 
+use super::{user::User, WithId};
+
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum GameState {
     Lobby,
@@ -26,5 +28,5 @@ pub struct Game {
     pub players_out: Vec<u32>,
     pub state: GameState,
     pub turn: u32,
-    pub users: Option<Vec<Thing>>,
+    pub users: Option<Vec<WithId<User>>>,
 }

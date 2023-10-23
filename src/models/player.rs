@@ -7,7 +7,7 @@ pub struct Player {
     pub cards: Cards,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct Cards {
     pub hand: Vec<String>,
     pub face_up: Vec<String>,

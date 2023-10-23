@@ -1,5 +1,5 @@
 use crate::shithead::game_server::Game;
-use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse, StartGameRequest, StartGameResponse};
+use crate::shithead::{CreateGameRequest, CreateGameResponse, GetGameRequest, GetGameResponse, StartGameRequest, StartGameResponse, GetUserResponse};
 use tonic::{Request, Response, Status};
 use crate::mediators::game::GameMediator;
 use crate::mediators::MediatorError;
@@ -28,9 +28,14 @@ impl Game for GameService {
         let res = self.mediator.get_game(req.id).await;
         match res {
             Ok(game) => {
-                let user_ids = game.inner.users.unwrap_or_default()
+                let users = game.inner.users.unwrap_or_default()
                                     .iter()
-                                    .map(|u| u.id.to_string())
+                                    .map(|u| {
+                                        GetUserResponse{
+                                            id: u.id.to_string(),
+                                            name: u.inner.name.clone(),
+                                        }
+                                    })
                                     .collect();
 
                 let reply = GetGameResponse {
@@ -41,7 +46,7 @@ impl Game for GameService {
                     players_out: game.inner.players_out,
                     state: game.inner.state.into(),
                     turn: game.inner.turn,
-                    users: user_ids,
+                    users: users,
                 };
                 Ok(Response::new(reply))
             }

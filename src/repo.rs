@@ -26,7 +26,7 @@ impl SurrealDBRepo {
     }
 
     pub async fn get_game(&self, id: String) -> Result<Option<WithId<Game>>, Error> {
-        let sql = format!("select *, <-player<-user as users from game:{}", &id);
+        let sql = format!("select *, <-player<-user.* as users from game:{}", &id);
 
         self.db.query(sql).await?.take(0)
     }

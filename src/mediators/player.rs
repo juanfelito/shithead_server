@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result, Error, Ok};
-use crate::dealer::{Dealer};
+use crate::dealer::Dealer;
 use crate::models::game::{Game, GameState};
-use crate::models::player::{Player};
+use crate::models::player::Player;
 use crate::models::WithId;
 use crate::repo::SurrealDBRepo;
 use super::MediatorError;
@@ -140,5 +140,18 @@ impl PlayerMediator {
         self.repo.get_player(game_id, user_id)
                 .await?
                 .ok_or(anyhow!(MediatorError::NotFound("Player not found".to_string())))
+    }
+
+    pub async fn get_opponents(&self, game_id: String, player_id: String) -> Result<Vec<WithId<Player>>, Error> {
+        let res = self.repo.get_players(game_id).await;
+        
+        if res.is_err() {
+            return Err(anyhow!(MediatorError::NotFound("Players not found".to_string())));
+        }
+
+        let mut players = res.unwrap();
+        players.retain(|p| p.id.id.to_string() != player_id);
+
+        return Ok(players);
     }
 }

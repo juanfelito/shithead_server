@@ -18,6 +18,7 @@ service User {
 
 service Player {
     rpc GetPlayer (GetPlayerRequest) returns (GetPlayerResponse);
+    rpc GetOponents (GetOpponentsRequest) returns (GetOpponentsResponse);
     rpc JoinGame (JoinGameRequest) returns (JoinGameResponse);
     rpc Play (PlayRequest) returns (PlayResponse);
 }
@@ -42,7 +43,7 @@ message GetGameResponse {
     repeated uint32 players_out = 5;
     string state = 6;
     uint32 turn = 7;
-    repeated string users = 8;
+    repeated GetUserResponse users = 8;
 }
 
 message GetDiscardRequest {
@@ -80,6 +81,15 @@ message JoinGameRequest {
 }
 
 message JoinGameResponse {}
+
+message GetOpponentsRequest {
+    string game_id = 1;
+    string player_id = 2;
+}
+
+message GetOpponentsResponse {
+    repeated GetPlayerResponse opponents = 1;
+}
 
 message GetPlayerRequest {
     string game_id = 1;

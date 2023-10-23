@@ -95,7 +95,7 @@ impl SurrealDBRepo {
         &self, player_id: String
     ) -> Result<(Option<WithId<Player>>, Option<WithId<Game>>), Error> {
         let sql = format!(
-            "select *, <-player<-user as users from game where <-(player where id = player:{}); select * from player:{};",
+            "select *, <-player<-user.* as users from game where <-(player where id = player:{}); select * from player:{};",
             player_id, player_id
         );
 

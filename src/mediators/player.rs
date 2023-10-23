@@ -22,6 +22,9 @@ impl PlayerMediator {
     ) -> Result<(Vec<String>, String, bool), Error> {
         let (player, game) = self.repo.get_player_and_game(player_id).await?;
 
+        println!("game: {:?}", game);
+        println!("player: {:?}", player);
+
         let mut player = player.ok_or(anyhow!(MediatorError::NotFound("Player not found".to_string())))?;
         let mut game = game.ok_or(anyhow!(MediatorError::NotFound("Game not found".to_string())))?;
 

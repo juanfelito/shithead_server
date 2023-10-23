@@ -106,6 +106,7 @@ message GetPlayerResponse {
     string id = 1;
     uint32 turn = 2;
     Cards cards = 3;
+    string user_id = 4;
 }
 
 message StartGameRequest {

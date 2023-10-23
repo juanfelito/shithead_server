@@ -78,6 +78,7 @@ impl Player for PlayerService {
                         id: p.id.id.to_string(),
                         turn: p.inner.turn,
                         cards: p.inner.cards.clone().into(),
+                        user_id: p.inner.r#in.id.to_string(),
                     }
                 }).collect();
                 let reply = GetOpponentsResponse {
@@ -111,6 +112,7 @@ impl Player for PlayerService {
                     id: player.id.id.to_string(),
                     turn: player.inner.turn,
                     cards: player.inner.cards.into(),
+                    user_id: player.inner.r#in.id.to_string(),
                 };
                 Ok(Response::new(reply))
             }

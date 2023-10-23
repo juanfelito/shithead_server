@@ -32,7 +32,7 @@ impl Game for GameService {
                                     .iter()
                                     .map(|u| {
                                         GetUserResponse{
-                                            id: u.id.to_string(),
+                                            id: u.id.id.to_string(),
                                             name: u.inner.name.clone(),
                                         }
                                     })
